@@ -24,7 +24,21 @@ No quotes, no trailing whitespace, no other content. This directory is mounted r
 
 ### `config.json`
 
-Place a `config.json` file in the directory you will mount as `/data` (e.g. your working directory). Example, using DeepSeek as the provider:
+Place a `config.json` file in the directory you will mount as `/data` (e.g. your working directory). The main providers are:
+
+| Provider    | `npm`                      | `base_url`                                                 |
+|-------------|----------------------------|------------------------------------------------------------|
+| DeepSeek    | `@ai-sdk/openai-compatible` | `https://api.deepseek.com/v1`                              |
+| OpenCode Go | `@ai-sdk/openai-compatible` | `https://opencode.ai/inference/go/openai/v1`               |
+| OpenAI      | `@ai-sdk/openai`           | `https://api.openai.com/v1`                                |
+| Anthropic   | `@ai-sdk/anthropic`        | `https://api.anthropic.com`                                |
+| Gemini      | `@ai-sdk/google`           | `https://generativelanguage.googleapis.com/v1beta`         |
+
+All six keys are required: `provider_id`, `provider_name`, `npm`, `base_url`, `model_id`, `model_name`.
+
+#### DeepSeek example
+
+Example using DeepSeek:
 
 ```json
 {
@@ -37,15 +51,22 @@ Place a `config.json` file in the directory you will mount as `/data` (e.g. your
 }
 ```
 
-All six keys are required: `provider_id`, `provider_name`, `npm`, `base_url`, `model_id`, `model_name`.
+#### OpenCode Go example
 
-Examples for other providers:
+Example using OpenCode Go (requires an OpenCode Go subscription key):
 
-| Provider  | `npm`                      | `base_url`                                                 |
-|-----------|----------------------------|------------------------------------------------------------|
-| OpenAI    | `@ai-sdk/openai`           | `https://api.openai.com/v1`                                |
-| Anthropic | `@ai-sdk/anthropic`        | `https://api.anthropic.com`                                |
-| Gemini    | `@ai-sdk/google`           | `https://generativelanguage.googleapis.com/v1beta`         |
+```json
+{
+  "provider_id":   "opencode-go",
+  "provider_name": "OpenCode Go",
+  "npm":           "@ai-sdk/openai-compatible",
+  "base_url":      "https://opencode.ai/inference/go/openai/v1",
+  "model_id":      "deepseek-v4.1-flash",
+  "model_name":    "DeepSeek V4.1 Flash"
+}
+```
+
+Keep `provider_id` set to `opencode-go`: OpenCode uses the `opencode` prefix to add the `x-opencode-session` header required by the OpenCode Go API. The list of available models is published at `https://opencode.ai/inference/go/v1/models`.
 
 # Using the dockeragent image in Linux
 
