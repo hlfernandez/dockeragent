@@ -80,7 +80,7 @@ STEP 4 — Print 'I am creating the Dockerfile', then create the /data/dockerage
      #   limitations under the License.
      #
    The Dockerfile MUST have EXACTLY ONE FROM instruction. Multi-stage builds are NEVER allowed.
-   The Dockerfile MUST use 'RUN git clone <repo_url>' to fetch the source code. Do NOT use COPY to bring in source files from the host. The git clone already done in STEP 1 is only for inspection — the Dockerfile must be self-contained and clone the repo itself.
+   The Dockerfile MUST fetch the source code from the upstream GitHub repository at a fixed version. Use `RUN git clone --branch <tag> --depth 1 <repo_url>` (preferred) or download the source release archive for the exact version (e.g., `https://github.com/<owner>/<repo>/archive/refs/tags/v<version>.tar.gz`). NEVER clone the default branch (`master`/`main`) and NEVER rely on a moving HEAD. Do NOT use COPY to bring in source files from the host. The git clone already done in STEP 1 is only for inspection — the Dockerfile must be self-contained and fetch the pinned source itself.
    Exception: if the Dockerfile uses COPY to include converted notebook scripts (see notebook rule below), those .py files must be placed in /data/dockeragent_results/<program_name>/ alongside the Dockerfile before building.
 
 STEP 5 — Print 'I am building the image', then run via bash:
@@ -146,7 +146,7 @@ Additional rules:
 ==============================================================
 - Use a specific Ubuntu version tag as the base image (e.g. ubuntu:24.04). NEVER use ubuntu:latest or any :latest tag.
 - When the Docker build fails due to packages that no longer exist in the latest Ubuntu, switch to the Ubuntu version that was available when the software was first published on GitHub.
-- Do NOT download pre-compiled binaries from GitHub Releases or third-party URLs (e.g. wget .tar.gz from a releases/ page). Pre-built binary URLs frequently return errors (e.g. wget exit code 8) because they are renamed, moved, or deleted over time. Instead, always build the tool from source: clone the tool's GitHub repository with RUN git clone and build it using its documented build instructions (make, cmake, etc.).
+- All GitHub source fetches in Dockerfiles MUST be pinned to a fixed version. Use `git clone --branch <tag> --depth 1` or download the source archive for the exact tag/release. Never clone `master`/`main` and never use an unpinned source URL.
 - Do NOT use a different/alternative package as a fallback when the required package fails to install. The fallback in a `||` chain MUST deliver the exact same software, not a substitute. For example, `pip install pymesh2 || pip install trimesh` is FORBIDDEN because trimesh is a different library. An acceptable `||` fallback is trying a different download URL or download tool (wget vs curl) for the same file (e.g. `wget <url> || curl <url>`). If the required package cannot be installed, fix the root cause (wrong version, missing build dep, etc.) instead of silently replacing it with something else.
 - The Dockerfile MUST have EXACTLY ONE FROM instruction. NEVER use multi-stage builds. NEVER write a second FROM line.
 - If the repository contains Jupyter notebooks (.ipynb files) that are part of the tool's workflow, convert each one to a plain Python script during STEP 2 by running via bash:

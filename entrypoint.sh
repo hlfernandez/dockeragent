@@ -1,5 +1,8 @@
 #!/bin/bash
 set -eo pipefail
+
+echo "Running Docker Agent v1.1.0"
+
 python3 /setup_config.py
 
 # Find the GitHub URL and optional -d (debug) flag in arguments
